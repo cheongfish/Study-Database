@@ -1,0 +1,57 @@
+# shard1 Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-shard1
+  labels:
+    app: postgres-shard1
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres-shard1
+---
+# shard2 Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-shard2
+  labels:
+    app: postgres-shard2
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres-shard2
+---
+# shard3 Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-shard3
+  labels:
+    app: postgres-shard3
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres-shard3
+---
+# pg-Admin Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-admin
+  labels:
+    app: pg-admin
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 31000
+  selector:
+    app: pg-admin

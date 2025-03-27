@@ -1,0 +1,156 @@
+# shard1 Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-shard1
+  labels:
+    app: postgres-shard1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-shard1
+  template:
+    metadata:
+      labels:
+        app: postgres-shard1
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14
+          env:
+            - name: POSTGRES_USER
+              value: "user"
+            - name: POSTGRES_PASSWORD
+              value: "password"
+            - name: POSTGRES_DB
+              value: "shard1_db"
+          # ports:
+          #   - containerPort: 5432
+          # 데이터 지속성을 위해 볼륨 마운트 추가 (학습 시 필요에 따라 PV/PVC 설정)
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+            - name: init-sql-volume
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+      volumes:
+        - name: pgdata
+          emptyDir: {} # 테스트용으로 임시 스토리지 사용. 실제 환경에서는 PVC 사용 권장.
+        - name: init-sql-volume
+          configMap:
+            name: postgres-init-sql
+
+---
+# shard2 Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-shard2
+  labels:
+    app: postgres-shard2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-shard2
+  template:
+    metadata:
+      labels:
+        app: postgres-shard2
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14
+          env:
+            - name: POSTGRES_USER
+              value: "user"
+            - name: POSTGRES_PASSWORD
+              value: "password"
+            - name: POSTGRES_DB
+              value: "shard2_db"
+          # ports:
+          #   - containerPort: 5433
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+            - name: init-sql-volume
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+      volumes:
+        - name: pgdata
+          emptyDir: {} # 테스트용으로 임시 스토리지 사용. 실제 환경에서는 PVC 사용 권장.
+        - name: init-sql-volume
+          configMap:
+            name: postgres-init-sql
+
+---
+# shard3 Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-shard3
+  labels:
+    app: postgres-shard3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-shard3
+  template:
+    metadata:
+      labels:
+        app: postgres-shard3
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14
+          env:
+            - name: POSTGRES_USER
+              value: "user"
+            - name: POSTGRES_PASSWORD
+              value: "password"
+            - name: POSTGRES_DB
+              value: "shard3_db"
+          # ports:
+          #   - containerPort: 5434
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+            - name: init-sql-volume
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+      volumes:
+        - name: pgdata
+          emptyDir: {} # 테스트용으로 임시 스토리지 사용. 실제 환경에서는 PVC 사용 권장.
+        - name: init-sql-volume
+          configMap:
+            name: postgres-init-sql
+---
+# pg Admin Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-admin
+  labels:
+    app: pg-admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pg-admin
+  template:
+    metadata:
+      labels:
+        app: pg-admin
+    spec:
+      containers:
+        - name: pg-admin
+          image: dpage/pgadmin4:latest
+          env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              value: "abc@email.com"
+            - name: PGADMIN_DEFAULT_PASSWORD
+              value: "password"
+          ports:
+            - containerPort: 80
