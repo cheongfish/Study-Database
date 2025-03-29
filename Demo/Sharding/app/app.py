@@ -14,21 +14,21 @@ clients = {}
 async def connect():
     global clients
     clients["shard1"] = await asyncpg.connect(
-        host="postgres-shard1",
+        host="postgres-shard1.postgres.svc.cluster.local",
         port=5432,
         user="user",
         password="password",
         database="postgres"
     )
     clients["shard2"] = await asyncpg.connect(
-        host="postgres-shard2",
+        host="postgres-shard2.postgres.svc.cluster.local",
         port=5432,
         user="user",
         password="password",
         database="postgres"
     )
     clients["shard3"] = await asyncpg.connect(
-        host="postgres-shard3",
+        host="postgres-shard3.postgres.svc.cluster.local",
         port=5432,
         user="user",
         password="password",
